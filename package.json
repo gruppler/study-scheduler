@@ -8,7 +8,10 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
-    "vue": "^2.5.13"
+    "date-arithmetic": "^3.1.0",
+    "vue": "^2.5.13",
+    "vue2-timepicker": "git+https://github.com/xxRockOnxx/vue2-timepicker.git",
+    "vuejs-datepicker": "^0.9.26"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.0.0-beta.1",
