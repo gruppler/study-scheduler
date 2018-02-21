@@ -11,7 +11,27 @@
             </label>
           </th>
           <td>
-            <input type="number" v-model.number="participant_count" id="participant_count" min="1" max="999">
+            <input type="number"
+              v-model.number="participant_count"
+              id="participant_count"
+              min="1"
+              max="999"
+            >
+          </td>
+        </tr>
+        <tr>
+          <th>
+            <label for="concurrent_sessions">
+              Concurrent Sessions
+            </label>
+          </th>
+          <td>
+            <input type="number"
+              v-model.number="concurrent_sessions"
+              id="concurrent_sessions"
+              min="1"
+              max="999"
+            >
           </td>
         </tr>
         <tr>
@@ -53,7 +73,13 @@
             <label for="session_duration">Session Duration</label>
           </th>
           <td>
-            <input type="number" v-model.number="session_duration" id="session_duration" min="0" max="999" step="5"> minutes
+            <input type="number"
+              v-model.number="session_duration"
+              id="session_duration"
+              min="0"
+              max="999"
+              :step="minute_interval"
+            > minutes
           </td>
         </tr>
         <tr>
@@ -61,7 +87,13 @@
             <label for="buffer_duration">Buffer Duration</label>
           </th>
           <td>
-            <input type="number" v-model.number="buffer_duration" id="buffer_duration" min="0" max="999" step="5"> minutes
+            <input type="number"
+              v-model.number="buffer_duration"
+              id="buffer_duration"
+              min="0"
+              max="999"
+              :step="minute_interval"
+            > minutes
           </td>
         </tr>
         <tr>
@@ -69,7 +101,13 @@
             <label for="lunch_duration">Lunch Duration</label>
           </th>
           <td>
-            <input type="number" v-model.number="lunch_duration" id="lunch_duration" min="0" max="999" step="5"> minutes
+            <input type="number"
+              v-model.number="lunch_duration"
+              id="lunch_duration"
+              min="0"
+              max="999"
+              :step="minute_interval"
+            > minutes
           </td>
         </tr>
         <tr>
@@ -155,18 +193,26 @@
       >
         <tr>
           <td>PID</td>
+          <td v-if="concurrent_sessions > 1">RID</td>
           <td>Day</td>
           <td v-if="separate_date_time">Date</td>
           <td>Start</td>
           <td>End</td>
         </tr>
-        <tr v-for="p in participants" :key="p.pid">
+        <tr v-for="(p, i) in participants" :key="i">
           <td>{{ p.pid }}</td>
+          <td v-if="concurrent_sessions > 1">{{ p.rid }}</td>
           <td>{{ dow(p.start) }}</td>
           <td v-if="separate_date_time">{{ formatDate(p.start) }}</td>
           <td v-if="separate_date_time">{{ formatTime(p.start) }}</td>
-          <td v-if="!separate_date_time">{{ formatDate(p.start) }} {{ formatTime(p.start) }}</td>
-          <td>{{ separate_date_time ? '' : formatDate(p.start) }} {{ formatTime(p.end) }}</td>
+          <td v-if="!separate_date_time">
+            {{ formatDate(p.start) }}
+            {{ formatTime(p.start) }}
+          </td>
+          <td>
+            {{ separate_date_time ? '' : formatDate(p.start) }}
+            {{ formatTime(p.end) }}
+          </td>
         </tr>
       </table>
     </div>
@@ -188,6 +234,7 @@ export default {
       date_format: 'hh:mm a',
       minute_interval: 5,
       participant_count: 35,
+      concurrent_sessions: 1,
       session_duration: 60,
       buffer_duration: 15,
       lunch_duration: 60,
@@ -249,9 +296,20 @@ export default {
         p = {
           pid: i + 1,
           start: session,
-          end: dm.add(session, this.session_duration, m)
+          end: dm.add(session, this.session_duration, m),
+          rid: 1
         }
         participants.push(p)
+
+        for (var j = 1; j < this.concurrent_sessions; j++) {
+          i++
+          participants.push({
+            pid: i + 1,
+            start: p.start,
+            end: p.end,
+            rid: j + 1
+          })
+        }
 
         if (
           this.lunch_duration && !lunchAdded &&
@@ -264,7 +322,8 @@ export default {
             participants.push({
               pid: 'lunch',
               start: p.end,
-              end: session
+              end: session,
+              rid: ''
             })
           }
         } else {
@@ -282,6 +341,7 @@ export default {
     sessions_per_day () {
       var count = 0, lunch = 0
       while (
+        count < this.participants.length &&
         this.participants[count].start.getDay() ===
           this.participants[0].start.getDay()
       ) {
