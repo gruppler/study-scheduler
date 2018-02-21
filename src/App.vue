@@ -299,6 +299,8 @@ export default {
       var minutes = 1 * time.mm + 60 * time.hh
       if (time.a === 'pm' && time.hh !== 12) {
         minutes += 60 * 12
+      } else if (time.a === 'am' && time.hh === 12) {
+        minutes -= 60 * 12
       }
       return minutes
     },
