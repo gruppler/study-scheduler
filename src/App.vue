@@ -100,7 +100,7 @@
           <th>
             <label for="lunch_duration">Lunch Duration</label>
           </th>
-          <td>
+          <td :class="{error: lunch_error}">
             <input type="number"
               v-model.number="lunch_duration"
               id="lunch_duration"
@@ -114,7 +114,7 @@
           <th>
             <label>Lunch Begin (earliest)</label>
           </th>
-          <td>
+          <td :class="{error: lunch_error}">
             <vue-timepicker
               :format="date_format"
               v-model="lunch_start"
@@ -127,8 +127,8 @@
           <th>
             <label>Lunch End (latest)</label>
           </th>
-          <td>
-              <vue-timepicker
+          <td :class="{error: lunch_error}">
+            <vue-timepicker
               :format="date_format"
               v-model="lunch_end"
               :minute-interval="minute_interval"
@@ -263,7 +263,8 @@ export default {
       },
       show_lunch: true,
       hour12: true,
-      separate_date_time: true
+      separate_date_time: true,
+      has_lunch: false
     }
   },
   computed: {
@@ -273,6 +274,7 @@ export default {
       var session = day
       var lunchAdded = false
       var p
+      this.has_lunch = false
       for (var i = 0; i < this.participant_count; i++) {
         if (
           dm.add(session, this.session_duration, m) >
@@ -322,6 +324,7 @@ export default {
         ) {
           session = dm.add(p.end, this.lunch_duration, m)
           lunchAdded = true
+          this.has_lunch = true
           if (this.show_lunch) {
             session = dm.max(p.end, dm.add(day, this.lunch_start_m, m))
             p = {
@@ -345,20 +348,19 @@ export default {
       }
       return participants
     },
+    lunch_error () {
+      return this.lunch_duration > 0 && !this.has_lunch
+    },
     sessions_per_day () {
       var count = 0
-      var lunch = 0
       while (
         count < this.participants.length &&
         this.participants[count].start.getDay() ===
           this.participants[0].start.getDay()
       ) {
-        if (this.participants[count].pid === 'lunch') {
-          lunch++
-        }
         count++
       }
-      return count - lunch
+      return count - 1 * (this.show_lunch && this.has_lunch)
     },
     total_days () {
       return Math.ceil(this.participant_count / this.sessions_per_day)
@@ -468,6 +470,9 @@ table#input
       font-size 1em
       padding .3em .5em
       border 1px solid #d2d2d2
+    &.error input
+      border-color: #f00;
+      background: rgba(#f00, 0.1)
 
 .time-picker .dropdown,
 .vdp-datepicker__calendar
