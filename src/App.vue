@@ -317,18 +317,21 @@ export default {
 
         if (
           this.lunch_duration && !lunchAdded &&
-          p.end > dm.add(day, this.lunch_start_m, m) &&
-          p.end <= dm.add(day, this.lunch_end_m, m)
+          p.end >= dm.add(day, this.lunch_start_m - this.buffer_duration, m) &&
+          p.end <= dm.add(day, this.lunch_end_m - this.lunch_duration, m)
         ) {
           session = dm.add(p.end, this.lunch_duration, m)
           lunchAdded = true
           if (this.show_lunch) {
-            participants.push({
+            session = dm.max(p.end, dm.add(day, this.lunch_start_m, m))
+            p = {
               pid: 'lunch',
-              start: p.end,
-              end: session,
+              start: session,
+              end: dm.add(session, this.lunch_duration, m),
               rid: ''
-            })
+            }
+            participants.push(p)
+            session = p.end
           }
         } else {
           session = dm.add(p.end, this.buffer_duration, m)
@@ -384,9 +387,9 @@ export default {
     },
     to_minutes (time) {
       var minutes = 1 * time.mm + 60 * time.hh
-      if (time.a === 'pm' && time.hh !== 12) {
+      if (time.a === 'pm' && time.hh !== '12') {
         minutes += 60 * 12
-      } else if (time.a === 'am' && time.hh === 12) {
+      } else if (time.a === 'am' && time.hh === '12') {
         minutes -= 60 * 12
       }
       return minutes
