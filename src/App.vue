@@ -214,12 +214,12 @@
           <td v-if="separate_date_time">{{ formatDate(p.start) }}</td>
           <td v-if="separate_date_time">
             {{ formatTime(p.start) }}
-            {{ separate_start_end ? '' : ' - ' + formatTime(p.end) }}
+            {{ separate_start_end ? '' : ' &ndash; ' + formatTime(p.end) }}
           </td>
           <td v-if="!separate_date_time">
             {{ formatDate(p.start) }}
             {{ formatTime(p.start) }}
-            {{ separate_start_end ? '' : ' - ' + formatTime(p.end) }}
+            {{ separate_start_end ? '' : ' &ndash; ' + formatTime(p.end) }}
           </td>
           <td v-if="separate_start_end">
             {{ separate_date_time ? '' : formatDate(p.start) }}
