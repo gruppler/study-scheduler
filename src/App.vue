@@ -46,7 +46,7 @@
           <th>
             <label>Day Begin</label>
           </th>
-          <td>
+          <td :class="{error: session_error}">
             <vue-timepicker
               :format="date_format"
               v-model="day_start"
@@ -59,7 +59,7 @@
           <th>
             <label>Day End</label>
           </th>
-          <td>
+          <td :class="{error: session_error}">
             <vue-timepicker
               :format="date_format"
               v-model="day_end"
@@ -72,7 +72,7 @@
           <th>
             <label for="session_duration">Session Duration</label>
           </th>
-          <td>
+          <td :class="{error: session_error}">
             <input type="number"
               v-model.number="session_duration"
               id="session_duration"
@@ -365,6 +365,9 @@ export default {
         day = dm.startOf(session, d)
       }
       return participants
+    },
+    session_error () {
+      return this.day_start_m > this.day_end_m + this.session_duration
     },
     lunch_error () {
       return this.lunch_duration > 0 && !this.has_lunch
