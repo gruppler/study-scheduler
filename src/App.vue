@@ -261,7 +261,7 @@ export default {
         mm: '00',
         a: 'pm'
       },
-      show_lunch: false,
+      show_lunch: true,
       hour12: true,
       separate_date_time: true
     }
@@ -339,7 +339,8 @@ export default {
       return participants
     },
     sessions_per_day () {
-      var count = 0, lunch = 0
+      var count = 0
+      var lunch = 0
       while (
         count < this.participants.length &&
         this.participants[count].start.getDay() ===
