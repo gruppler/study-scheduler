@@ -2,7 +2,7 @@
   <div id="app">
     <h1>Study Scheduler</h1>
     <div class="container">
-      <table class="input">
+      <table id="input">
         <tr>
           <th>
             <label for="participant_count">
@@ -11,7 +11,7 @@
             </label>
           </th>
           <td>
-            <input type="number" v-model="participant_count" id="participant_count" min="1" max="999">
+            <input type="number" v-model.number="participant_count" id="participant_count" min="1" max="999">
           </td>
         </tr>
         <tr>
@@ -53,7 +53,7 @@
             <label for="session_duration">Session Duration</label>
           </th>
           <td>
-            <input type="number" v-model="session_duration" id="session_duration" min="1" max="999"> minutes
+            <input type="number" v-model.number="session_duration" id="session_duration" min="0" max="999" step="5"> minutes
           </td>
         </tr>
         <tr>
@@ -61,7 +61,7 @@
             <label for="buffer_duration">Buffer Duration</label>
           </th>
           <td>
-            <input type="number" v-model="buffer_duration" id="buffer_duration" min="0" max="999"> minutes
+            <input type="number" v-model.number="buffer_duration" id="buffer_duration" min="0" max="999" step="5"> minutes
           </td>
         </tr>
         <tr>
@@ -69,7 +69,7 @@
             <label for="lunch_duration">Lunch Duration</label>
           </th>
           <td>
-            <input type="number" v-model="lunch_duration" id="lunch_duration" min="0" max="999"> minutes
+            <input type="number" v-model.number="lunch_duration" id="lunch_duration" min="0" max="999" step="5"> minutes
           </td>
         </tr>
         <tr>
@@ -116,22 +116,45 @@
         </tr>
         <tr>
           <th>
+            <label for="hour12">12-Hour Time</label>
+          </th>
+          <td>
+            <input type="checkbox" v-model="hour12" id="hour12">
+          </td>
+        </tr>
+        <tr>
+          <th>
             <label for="separate_date_time">Separate Date and Time</label>
           </th>
           <td>
             <input type="checkbox" v-model="separate_date_time" id="separate_date_time">
           </td>
         </tr>
-      </table>
-      <table class="output">
         <tr>
-          <th>PID</th>
-          <th v-if="separate_date_time">Date</th>
-          <th>Start</th>
-          <th>End</th>
+          <th>Sessions per Day</th>
+          <td>{{ sessions_per_day }}</td>
+        </tr>
+        <tr>
+          <th>Total Days</th>
+          <td>{{ total_days }}</td>
+        </tr>
+      </table>
+      <table id="output"
+        @mousedown="select_all"
+        @mouseup="select_all"
+        @touchstart="select_all"
+        @touchend="select_all"
+      >
+        <tr>
+          <td>PID</td>
+          <td>Day</td>
+          <td v-if="separate_date_time">Date</td>
+          <td>Start</td>
+          <td>End</td>
         </tr>
         <tr v-for="p in participants" :key="p.pid">
           <td>{{ p.pid }}</td>
+          <td>{{ dow(p.start) }}</td>
           <td v-if="separate_date_time">{{ formatDate(p.start) }}</td>
           <td v-if="separate_date_time">{{ formatTime(p.start) }}</td>
           <td v-if="!separate_date_time">{{ formatDate(p.start) }} {{ formatTime(p.start) }}</td>
@@ -183,6 +206,7 @@ export default {
         mm: '00',
         a: 'pm'
       },
+      hour12: true,
       separate_date_time: true
     }
   },
@@ -239,6 +263,16 @@ export default {
       }
       return participants
     },
+    sessions_per_day () {
+      var count = 0
+      while (this.participants[count].start.getDay() === this.participants[0].start.getDay()) {
+        count++
+      }
+      return count
+    },
+    total_days () {
+      return Math.ceil(this.participant_count / this.sessions_per_day)
+    },
     day_start_m () {
       return this.to_minutes(this.day_start)
     },
@@ -253,6 +287,14 @@ export default {
     }
   },
   methods: {
+    select_all () {
+      var el = document.getElementById('output')
+      var range = document.createRange()
+      range.selectNodeContents(el)
+      var selection = window.getSelection()
+      selection.removeAllRanges()
+      selection.addRange(range)
+    },
     to_minutes (time) {
       var minutes = 1 * time.mm + 60 * time.hh
       if (time.a === 'pm' && time.hh !== 12) {
@@ -260,12 +302,12 @@ export default {
       }
       return minutes
     },
+    dow (date) {
+      return date.toLocaleDateString([], { weekday: 'short' })
+    },
     formatDate (date) {
-      var local = new Date(date)
-      local.setMinutes(date.getMinutes() - date.getTimezoneOffset())
       return date.toLocaleDateString(
-        navigator.language, {
-          weekday: 'short',
+        [], {
           year: 'numeric',
           month: 'numeric',
           day: 'numeric'
@@ -273,10 +315,13 @@ export default {
       )
     },
     formatTime (time) {
-      return this.pad(time.getHours()) + ':' + this.pad(time.getMinutes())
-    },
-    pad (number) {
-      return number ? (number < 10 ? '0' : '') + Math.floor(number) : '00'
+      return time.toLocaleTimeString(
+        [], {
+          hour: 'numeric',
+          minute: 'numeric',
+          hour12: this.hour12
+        }
+      )
     }
   },
   components: {
@@ -288,7 +333,7 @@ export default {
 
 <style lang="stylus">
 #app
-  font-family 'Avenir', Helvetica, Arial, sans-serif
+  font-family calibri, sans-serif
   -webkit-font-smoothing antialiased
   -moz-osx-font-smoothing grayscale
   color #2c3e50
@@ -308,30 +353,50 @@ h1
 td
   padding .3em .5em
 
-table.output
+table#output
+  font-size 11pt
   min-width 5em
   border-collapse collapse
   td
-    border 1px solid #d2d2d2
+    white-space nowrap
+    vertical-align bottom
 
-table.input
+table#input
   position: sticky
   top: 1em
   flex-shrink 0
-
   th
     text-align left
     padding-right 0.5em
 
   th, td
     padding-bottom 1em
-
   td
     input
       font-size 1em
       padding .3em .5em
       border 1px solid #d2d2d2
 
-.vdp-datepicker input
-  width 10em
+.time-picker .dropdown,
+.vdp-datepicker__calendar
+  user-select none
+  tap-highlight-color transparent
+
+.vdp-datepicker
+  input
+    width 10em
+
+.vdp-datepicker__calendar
+  border 0 none !important
+  box-shadow 0 1px 6px rgba(0,0,0,.15)
+  .cell.selected,
+  .cell.selected.highlighted,
+  .cell.selected:hover
+    background #41b883 !important
+    color #fff
+  .cell:not(.blank):not(.disabled).day:hover,
+  .cell:not(.blank):not(.disabled).month:hover,
+  .cell:not(.blank):not(.disabled).year:hover
+    border-color transparent !important
+    background rgba(0,0,0,.08)
 </style>
