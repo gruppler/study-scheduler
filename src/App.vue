@@ -110,7 +110,7 @@
             > minutes
           </td>
         </tr>
-        <tr>
+        <tr v-show="lunch_duration > 0">
           <th>
             <label>Lunch Begin (earliest)</label>
           </th>
@@ -123,7 +123,7 @@
             ></vue-timepicker>
           </td>
         </tr>
-        <tr>
+        <tr v-show="lunch_duration > 0">
           <th>
             <label>Lunch End (latest)</label>
           </th>
@@ -136,7 +136,7 @@
             ></vue-timepicker>
           </td>
         </tr>
-        <tr>
+        <tr v-show="lunch_duration > 0">
           <th>
             <label for="show_lunch">Show Lunch</label>
           </th>
