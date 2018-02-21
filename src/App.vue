@@ -301,7 +301,11 @@ export default {
         }
         participants.push(p)
 
-        for (var j = 1; j < this.concurrent_sessions; j++) {
+        for (
+          var j = 1;
+          j < this.concurrent_sessions && i + 1 < this.participant_count;
+          j++
+        ) {
           i++
           participants.push({
             pid: i + 1,
