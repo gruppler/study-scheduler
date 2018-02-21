@@ -184,6 +184,14 @@
             <input type="checkbox" v-model="separate_start_end" id="separate_start_end">
           </td>
         </tr>
+        <tr v-show="!separate_start_end">
+          <th>
+            <label for="separator">Time Separator</label>
+          </th>
+          <td>
+            <input type="text" size="3" v-model="separator" id="separator">
+          </td>
+        </tr>
         <tr>
           <th>Sessions per Day</th>
           <td>{{ sessions_per_day }}</td>
@@ -213,13 +221,11 @@
           <td>{{ dow(p.start) }}</td>
           <td v-if="separate_date_time">{{ formatDate(p.start) }}</td>
           <td v-if="separate_date_time">
-            {{ formatTime(p.start) }}
-            {{ separate_start_end ? '' : ' &ndash; ' + formatTime(p.end) }}
+            {{ formatTime(p.start) + (separate_start_end ? '' : separator + formatTime(p.end)) }}
           </td>
           <td v-if="!separate_date_time">
             {{ formatDate(p.start) }}
-            {{ formatTime(p.start) }}
-            {{ separate_start_end ? '' : ' &ndash; ' + formatTime(p.end) }}
+            {{ formatTime(p.start) + (separate_start_end ? '' : separator + formatTime(p.end)) }}
           </td>
           <td v-if="separate_start_end">
             {{ separate_date_time ? '' : formatDate(p.start) }}
@@ -277,6 +283,7 @@ export default {
       hour12: true,
       separate_date_time: true,
       separate_start_end: true,
+      separator: ' – ',
       has_lunch: false
     }
   },
