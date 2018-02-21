@@ -177,6 +177,14 @@
           </td>
         </tr>
         <tr>
+          <th>
+            <label for="separate_start_end">Separate Start and End</label>
+          </th>
+          <td>
+            <input type="checkbox" v-model="separate_start_end" id="separate_start_end">
+          </td>
+        </tr>
+        <tr>
           <th>Sessions per Day</th>
           <td>{{ sessions_per_day }}</td>
         </tr>
@@ -196,20 +204,24 @@
           <td v-if="concurrent_sessions > 1">RID</td>
           <td>Day</td>
           <td v-if="separate_date_time">Date</td>
-          <td>Start</td>
-          <td>End</td>
+          <td>{{separate_start_end ? 'Start' : 'Time'}}</td>
+          <td v-if="separate_start_end">End</td>
         </tr>
         <tr v-for="(p, i) in participants" :key="i">
           <td>{{ p.pid }}</td>
           <td v-if="concurrent_sessions > 1">{{ p.rid }}</td>
           <td>{{ dow(p.start) }}</td>
           <td v-if="separate_date_time">{{ formatDate(p.start) }}</td>
-          <td v-if="separate_date_time">{{ formatTime(p.start) }}</td>
+          <td v-if="separate_date_time">
+            {{ formatTime(p.start) }}
+            {{ separate_start_end ? '' : ' - ' + formatTime(p.end) }}
+          </td>
           <td v-if="!separate_date_time">
             {{ formatDate(p.start) }}
             {{ formatTime(p.start) }}
+            {{ separate_start_end ? '' : ' - ' + formatTime(p.end) }}
           </td>
-          <td>
+          <td v-if="separate_start_end">
             {{ separate_date_time ? '' : formatDate(p.start) }}
             {{ formatTime(p.end) }}
           </td>
@@ -264,6 +276,7 @@ export default {
       show_lunch: true,
       hour12: true,
       separate_date_time: true,
+      separate_start_end: true,
       has_lunch: false
     }
   },
