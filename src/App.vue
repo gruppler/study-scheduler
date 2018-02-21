@@ -2,7 +2,7 @@
   <div id="app">
     <h1>Study Scheduler</h1>
     <div class="container">
-      <table id="input">
+      <table id="input" class="sticky">
         <tr>
           <th>
             <label for="participant_count">
@@ -192,47 +192,45 @@
             <input type="text" size="3" v-model="separator" id="separator">
           </td>
         </tr>
-        <tr>
-          <th>Sessions per Day</th>
-          <td>{{ sessions_per_day }}</td>
-        </tr>
-        <tr>
-          <th>Total Days</th>
-          <td>{{ total_days }}</td>
-        </tr>
       </table>
-      <table id="output"
-        @mousedown="select_all"
-        @mouseup="select_all"
-        @touchstart="select_all"
-        @touchend="select_all"
-      >
-        <tr>
-          <td>PID</td>
-          <td v-if="concurrent_sessions > 1">RID</td>
-          <td>Day</td>
-          <td v-if="separate_date_time">Date</td>
-          <td>{{separate_start_end ? 'Start' : 'Time'}}</td>
-          <td v-if="separate_start_end">End</td>
-        </tr>
-        <tr v-for="(p, i) in participants" :key="i">
-          <td>{{ p.pid }}</td>
-          <td v-if="concurrent_sessions > 1">{{ p.rid }}</td>
-          <td>{{ dow(p.start) }}</td>
-          <td v-if="separate_date_time">{{ formatDate(p.start) }}</td>
-          <td v-if="separate_date_time">
-            {{ formatTime(p.start) + (separate_start_end ? '' : separator + formatTime(p.end)) }}
-          </td>
-          <td v-if="!separate_date_time">
-            {{ formatDate(p.start) }}
-            {{ formatTime(p.start) + (separate_start_end ? '' : separator + formatTime(p.end)) }}
-          </td>
-          <td v-if="separate_start_end">
-            {{ separate_date_time ? '' : formatDate(p.start) }}
-            {{ formatTime(p.end) }}
-          </td>
-        </tr>
-      </table>
+      <div id="output">
+        <div class="sticky">
+          Sessions per Day: <strong>{{ sessions_per_day }}</strong>
+          <span style="float: right">Total Days: <strong>{{ total_days }}</strong></span>
+        </div>
+        <table
+          @mousedown="select_all"
+          @mouseup="select_all"
+          @touchstart="select_all"
+          @touchend="select_all"
+        >
+          <tr>
+            <td>PID</td>
+            <td v-if="concurrent_sessions > 1">RID</td>
+            <td>Day</td>
+            <td v-if="separate_date_time">Date</td>
+            <td>{{separate_start_end ? 'Start' : 'Time'}}</td>
+            <td v-if="separate_start_end">End</td>
+          </tr>
+          <tr v-for="(p, i) in participants" :key="i">
+            <td>{{ p.pid }}</td>
+            <td v-if="concurrent_sessions > 1">{{ p.rid }}</td>
+            <td>{{ dow(p.start) }}</td>
+            <td v-if="separate_date_time">{{ formatDate(p.start) }}</td>
+            <td v-if="separate_date_time">
+              {{ formatTime(p.start) + (separate_start_end ? '' : separator + formatTime(p.end)) }}
+            </td>
+            <td v-if="!separate_date_time">
+              {{ formatDate(p.start) }}
+              {{ formatTime(p.start) + (separate_start_end ? '' : separator + formatTime(p.end)) }}
+            </td>
+            <td v-if="separate_start_end">
+              {{ separate_date_time ? '' : formatDate(p.start) }}
+              {{ formatTime(p.end) }}
+            </td>
+          </tr>
+        </table>
+      </div>
     </div>
   </div>
 </template>
@@ -400,7 +398,7 @@ export default {
   },
   methods: {
     select_all () {
-      var el = document.getElementById('output')
+      var el = document.querySelector('#output table')
       var range = document.createRange()
       range.selectNodeContents(el)
       var selection = window.getSelection()
@@ -459,6 +457,11 @@ h1
   font-size 0.8em
   font-weight normal
 
+.sticky
+  background #fff
+  position sticky
+  top 0
+
 .container
   display flex
   flex-direction row
@@ -476,8 +479,6 @@ table#output
     vertical-align bottom
 
 table#input
-  position: sticky
-  top: 1em
   flex-shrink 0
   th
     text-align left
@@ -491,8 +492,8 @@ table#input
       padding .3em .5em
       border 1px solid #d2d2d2
     &.error input
-      border-color: #f00;
-      background: rgba(#f00, 0.1)
+      border-color #f00
+      background rgba(#f00, 0.1)
 
 .time-picker .dropdown,
 .vdp-datepicker__calendar
