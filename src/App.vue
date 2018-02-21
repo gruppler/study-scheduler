@@ -100,6 +100,14 @@
         </tr>
         <tr>
           <th>
+            <label for="show_lunch">Show Lunch</label>
+          </th>
+          <td>
+            <input type="checkbox" v-model="show_lunch" id="show_lunch">
+          </td>
+        </tr>
+        <tr>
+          <th>
             <label for="include_saturday">Include Saturday</label>
           </th>
           <td>
@@ -206,6 +214,7 @@ export default {
         mm: '00',
         a: 'pm'
       },
+      show_lunch: false,
       hour12: true,
       separate_date_time: true
     }
@@ -251,6 +260,13 @@ export default {
         ) {
           session = dm.add(p.end, this.lunch_duration, m)
           lunchAdded = true
+          if (this.show_lunch) {
+            participants.push({
+              pid: 'lunch',
+              start: p.end,
+              end: session
+            })
+          }
         } else {
           session = dm.add(p.end, this.buffer_duration, m)
         }
@@ -264,11 +280,17 @@ export default {
       return participants
     },
     sessions_per_day () {
-      var count = 0
-      while (this.participants[count].start.getDay() === this.participants[0].start.getDay()) {
+      var count = 0, lunch = 0
+      while (
+        this.participants[count].start.getDay() ===
+          this.participants[0].start.getDay()
+      ) {
+        if (this.participants[count].pid === 'lunch') {
+          lunch++
+        }
         count++
       }
-      return count
+      return count - lunch
     },
     total_days () {
       return Math.ceil(this.participant_count / this.sessions_per_day)
