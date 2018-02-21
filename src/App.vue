@@ -130,7 +130,7 @@
           <th>Start</th>
           <th>End</th>
         </tr>
-        <tr v-for="p in participants">
+        <tr v-for="p in participants" :key="p.pid">
           <td>{{ p.pid }}</td>
           <td v-if="separate_date_time">{{ formatDate(p.start) }}</td>
           <td v-if="separate_date_time">{{ formatTime(p.start) }}</td>
@@ -148,7 +148,6 @@ import Datepicker from 'vuejs-datepicker'
 import dm from 'date-arithmetic'
 
 var m = 'minutes'
-var h = 'hours'
 var d = 'day'
 
 export default {
@@ -192,7 +191,7 @@ export default {
       var participants = []
       var day = dm.startOf(this.first_day, d)
       var session = day
-      var lunch_added = false
+      var lunchAdded = false
       var p
       for (var i = 0; i < this.participant_count; i++) {
         if (
@@ -200,7 +199,7 @@ export default {
             dm.add(day, this.day_end_m, m)
         ) {
           day = dm.add(day, 1, d)
-          lunch_added = false
+          lunchAdded = false
         }
 
         if (day.getDay() === 6 && !this.include_saturday) {
@@ -222,18 +221,18 @@ export default {
         participants.push(p)
 
         if (
-          this.lunch_duration && !lunch_added &&
+          this.lunch_duration && !lunchAdded &&
           p.end > dm.add(day, this.lunch_start_m, m) &&
           p.end <= dm.add(day, this.lunch_end_m, m)
         ) {
           session = dm.add(p.end, this.lunch_duration, m)
-          lunch_added = true
+          lunchAdded = true
         } else {
           session = dm.add(p.end, this.buffer_duration, m)
         }
 
-        if (day.getDate() != session.getDate()) {
-          lunch_added = false
+        if (day.getDate() !== session.getDate()) {
+          lunchAdded = false
         }
 
         day = dm.startOf(session, d)
@@ -255,15 +254,15 @@ export default {
   },
   methods: {
     to_minutes (time) {
-      var minutes = 1*time.mm + 60*time.hh
-      if (time.a == 'pm' && time.hh != 12) {
-        minutes += 60*12
+      var minutes = 1 * time.mm + 60 * time.hh
+      if (time.a === 'pm' && time.hh !== 12) {
+        minutes += 60 * 12
       }
       return minutes
     },
     formatDate (date) {
       var local = new Date(date)
-      local.setMinutes(date.getMinutes() - date.getTimezoneOffset());
+      local.setMinutes(date.getMinutes() - date.getTimezoneOffset())
       return date.toLocaleDateString(
         navigator.language, {
           weekday: 'short',
