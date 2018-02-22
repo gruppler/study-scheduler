@@ -498,6 +498,12 @@ table#input
       border-color #f00
       background rgba(#f00, 0.1)
 
+.time-picker
+  input.display-time
+    height 1.7em
+  .dropdown
+    top 1.7em
+
 .time-picker .dropdown,
 .vdp-datepicker__calendar
   user-select none
