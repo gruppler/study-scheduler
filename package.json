@@ -9,18 +9,19 @@
   },
   "dependencies": {
     "date-arithmetic": "^3.1.0",
-    "vue": "^2.5.13",
+    "vue": "^2.6.6",
     "vue2-timepicker": "git+https://github.com/xxRockOnxx/vue2-timepicker.git",
-    "vuejs-datepicker": "^0.9.26"
+    "vuejs-datepicker": "^0.9.29",
+    "vuejs-timepicker": "git+https://github.com/xxRockOnxx/vue2-timepicker.git"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "^3.0.0-beta.1",
-    "@vue/cli-plugin-eslint": "^3.0.0-beta.1",
-    "@vue/cli-service": "^3.0.0-beta.1",
-    "@vue/eslint-config-standard": "^3.0.0-beta.1",
+    "@vue/cli-plugin-babel": "^3.4.0",
+    "@vue/cli-plugin-eslint": "^3.4.0",
+    "@vue/cli-service": "^3.4.0",
+    "@vue/eslint-config-standard": "^3.0.5",
     "stylus": "^0.54.5",
-    "stylus-loader": "^3.0.1",
-    "vue-template-compiler": "^2.5.13"
+    "stylus-loader": "^3.0.2",
+    "vue-template-compiler": "^2.6.6"
   },
   "browserslist": [
     "> 1%",

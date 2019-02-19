@@ -236,6 +236,8 @@
 </template>
 
 <script>
+/* eslint-disable */
+
 import VueTimepicker from 'vue2-timepicker'
 import Datepicker from 'vuejs-datepicker'
 import dm from 'date-arithmetic'
